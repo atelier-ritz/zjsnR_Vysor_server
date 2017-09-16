@@ -5,11 +5,11 @@ class Adafruit_StepperMotor:
     MICROSTEPS = 8
     MICROSTEP_CURVE = [0, 50, 98, 142, 180, 212, 236, 250, 255]
 
-    def __init__(self, controller, num, steps=200):
+    def __init__(self, controller, num, steps=100):
         self.MC = controller
         self.revsteps = steps
         self.motornum = num
-        self.sec_per_step = 0.005
+        self.sec_per_step = 0.03
         self.steppingcounter = 0
         self.currentstep = 0
 
