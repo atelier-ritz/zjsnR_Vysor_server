@@ -9,6 +9,7 @@ import sys
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(21,GPIO.OUT)
+GPIO.setup(20,GPIO.OUT)
 
 mh = Adafruit_MotorHAT()
 
@@ -24,10 +25,29 @@ def stepper_worker(stepper, numsteps, direction, style):
     print("Motor {} starts stepping!".format(stepper.motornum))
     stepper.step(numsteps, direction, style)
     print("Motor {} is done!".format(stepper.motornum))
-    svr.client[0][0].sendto('Motor {} is done!'.format(stepper.motornum).encode(), svr.client[0][1])
 
 def analyzecmd(cmd):
     print('Command - {}'.format(cmd))
+    if cmd[0] == 'motorGoAndTouch':
+        th1 = threading.Thread(target=stepper_worker,
+                                args=(mh.getStepper(2), int(cmd[1]), int(cmd[2]),
+                                Adafruit_MotorHAT.DOUBLE,))
+        th2 = threading.Thread(target=stepper_worker,
+                                args=(mh.getStepper(1), int(cmd[3]), int(cmd[4]),
+                                Adafruit_MotorHAT.DOUBLE,))
+        th1.start()
+        th2.start()
+        th1.join()
+        th2.join()
+        time.sleep(.5)
+        GPIO.output(21,True)
+        time.sleep(float(cmd[5]))
+        GPIO.output(21,False)
+        svr.client[0][0].sendto('Motor is done!'.encode(), svr.client[0][1])
+    if cmd[0] == 'powerOn':
+        GPIO.output(20,False)
+    if cmd[0] == 'powerOff':
+        GPIO.output(20,True)
     if cmd[0] == 'setparam':
         mystepper1 = mh.getStepper(1)
         mystepper2 = mh.getStepper(2)

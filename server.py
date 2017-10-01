@@ -3,7 +3,7 @@ import threading
 import time
 
 class Server(object):
-    def __init__(self,host='192.168.0.173',port=9997):
+    def __init__(self,host='192.168.0.16',port=9997):
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
